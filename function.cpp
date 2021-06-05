@@ -20,25 +20,23 @@ public:
 
 Node *table_left[HALF_MAX] = {nullptr};
 Node *table_right[HALF_MAX] = {nullptr};
-int input_left[N_MAX / 2] = {0};
-int input_right[N_MAX / 2] = {0};
 int n, l, r, c;
 
-int min(int a, int b)
-{
-    if (a <= b)
+int min(int a, int b){
+    if(a <= b)
         return a;
     else
         return b;
 }
 
-void memoryfree(Node* arr[] , int n){
-    for(int i = 0 ; i <= n ; i++){
-        for(Node* ptr = arr[i]->next ; ptr != nullptr ; ){
+void memoryfree(Node* (*arr)[HALF_MAX] , int n){
+    for(int i = 0 ; i <= n / 2 ; i++){
+        for(Node* ptr = (*arr)[i]->next ; ptr != nullptr ; ){
             Node* tmp = ptr->next;
             delete ptr;
             ptr = tmp;
         }
+        (*arr)[i]->next = nullptr;
     }
     return;
 }
@@ -80,23 +78,16 @@ void mysort(T arr[], int f, int l)
     return;
 }
 
-void initialization()
+void initialization(Node* arr[] , int in[])
 {
-    cin >> n >> l >> r >> c;
     for(int i = 0 ; i < n / 2 ; i++){
-        cin >> input_left[i];
+        cin >> in[i];
     }
-    for(int i = 0 ; i < n / 2 ; i++){
-        cin >> input_right[i];
-    }
-    mysort<int>(input_left, 0, n / 2 - 1);
-    mysort<int>(input_right, 0, n / 2 - 1);
+
+    mysort<int>(in, 0, n / 2 - 1);
     for(int i = 0 ; i < HALF_MAX ; i++){
-        if(table_left[i] == nullptr){
-            table_left[i] = new Node;
-        }
-        if(table_right[i] == nullptr){
-            table_right[i] = new Node;
+        if(arr[i] == nullptr){
+            arr[i] = new Node;
         }
     }
     return;
@@ -120,12 +111,41 @@ void build_table(Node* arr[] , int input[], int n){
     }
 }
 
-void solve()
-{
-    initialization();
-    build_table(table_left, input_left, n);
-    build_table(table_right, input_right, n);
+int* build_hashtable(int input[] , int n){
+    int* arr = new int[(n / 2)];
+    for(int i = 0 , j = 0 , k = 0 ; i < n / 2 ; i = j , k++){ // build look-up table for left gloves and right gloves
+        arr[k] = input[i];
+        for (; j < n / 2; j++)
+        {
+            if(input[j] != arr[k]){
+                break;
+            }
+        }
+    }
+    return arr;
+}
 
+int hashing(Node* table[], int g, int n){
+    for(int i = 1 ; i <= n / 2 ; i++){
+        for (Node* ptr = table[i]->next ; ptr != nullptr; ptr = ptr->next)
+        {
+            if(ptr->key < g){
+                break;
+            }
+            if(ptr->key == g){
+                return i;
+            }
+        }
+    }
+    return 0;
+}
+
+int difference(int gl , int gr){
+    int minimum = min(gl,gr);
+    return (gl - minimum);
+}
+
+void PrintTable() {
     for(int i = 0 ; i <= n ; i++){
         if(table_left[i]->next == nullptr){
             cout << "head" << i << endl;
@@ -151,8 +171,42 @@ void solve()
             cout << "end" << endl;
         }
     }
+}
+
+void solve()
+{
+
+    int input_left[N_MAX / 2] = {0};
+    int input_right[N_MAX / 2] = {0};
+    int* gems = new int[1]();
+    int total_cost = 0;
+
+    cin >> n >> l >> r >> c;
+    initialization(table_left, input_left);
+    initialization(table_right, input_right);
+    build_table(table_left, input_left, n);
+    build_table(table_right, input_right, n);
+    gems = build_hashtable(input_left, n); // important!!! using input_left as template to calculate difference
+    
+    for(int i = 0 ; i < n / 2 ; i++){
+        if(gems[i] == 0){
+            break;
+        }
+        int geml = hashing(table_left, gems[i], n);
+        int gemr = hashing(table_right, gems[i], n);
+        total_cost += difference(geml , gemr) * c;
+    }
 
     int rlcost = abs(l - r) * c / 2; // cost for exchanging left to right gloves
+    total_cost += rlcost;
+
+    cout<<total_cost<<endl;
+
+    memoryfree(&table_left, n);
+    memoryfree(&table_right, n);
+    delete gems;
+
+    //PrintTable();
 
     return;
 }
