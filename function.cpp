@@ -126,7 +126,7 @@ int* build_hashtable(int input[] , int n){
 }
 
 int hashing(Node* table[], int g, int n){
-    for(int i = 1 ; i <= n / 2 ; i++){
+    for(int i = 0 ; i <= n / 2 ; i++){
         for (Node* ptr = table[i]->next ; ptr != nullptr; ptr = ptr->next)
         {
             if(ptr->key < g){
@@ -145,41 +145,13 @@ int difference(int gl , int gr){
     return (gl - minimum);
 }
 
-void PrintTable() {
-    for(int i = 0 ; i <= n ; i++){
-        if(table_left[i]->next == nullptr){
-            cout << "head" << i << endl;
-        }
-        else{
-            cout << "head" << i << " -> ";
-            for(Node* ptr = table_left[i]->next ; ptr != nullptr ; ptr = ptr->next){
-                cout << ptr->key << " -> ";
-            }
-            cout << "end" << endl;
-        }
-    }
-
-    for(int i = 0 ; i <= n ; i++){
-        if(table_right[i]->next == nullptr){
-            cout << "head" << i << endl;
-        }
-        else{
-            cout << "head" << i << " -> ";
-            for(Node* ptr = table_right[i]->next ; ptr != nullptr ; ptr = ptr->next){
-                cout << ptr->key << " -> ";
-            }
-            cout << "end" << endl;
-        }
-    }
-}
-
 void solve()
 {
 
-    int input_left[N_MAX / 2] = {0};
-    int input_right[N_MAX / 2] = {0};
+    int input_left[N_MAX / 2];
+    int input_right[N_MAX / 2];
     int* gems = new int[1]();
-    int total_cost = 0;
+    long long int total_cost = 0;
 
     cin >> n >> l >> r >> c;
     initialization(table_left, input_left);
@@ -197,7 +169,7 @@ void solve()
         total_cost += difference(geml , gemr) * c;
     }
 
-    int rlcost = abs(l - r) * c / 2; // cost for exchanging left to right gloves
+    long long int rlcost = abs(l - r) * c / 2; // cost for exchanging left to right gloves
     total_cost += rlcost;
 
     cout<<total_cost<<endl;
@@ -205,8 +177,6 @@ void solve()
     memoryfree(&table_left, n);
     memoryfree(&table_right, n);
     delete gems;
-
-    //PrintTable();
 
     return;
 }
