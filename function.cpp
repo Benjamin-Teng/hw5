@@ -78,18 +78,13 @@ void mysort(T arr[], int f, int l)
     return;
 }
 
-void initialization(Node* arr[] , int in[])
+void initialization(int in[] , int n)
 {
-    for(int i = 0 ; i < n / 2 ; i++){
+    for(int i = 0 ; i < n ; i++){
         cin >> in[i];
     }
 
-    mysort<int>(in, 0, n / 2 - 1);
-    for(int i = 0 ; i < HALF_MAX ; i++){
-        if(arr[i] == nullptr){
-            arr[i] = new Node;
-        }
-    }
+    mysort<int>(in, 0, n - 1);
     return;
 }
 
@@ -125,6 +120,11 @@ int* build_hashtable(int input[] , int n){
     return arr;
 }
 
+void linear_scan(int* tmp[], int* arr[], int tmpsize, int arrsize){
+    int* newt;
+    int* newr;
+}
+
 int hashing(Node* table[], int g, int n){
     for(int i = 0 ; i <= n / 2 ; i++){
         for (Node* ptr = table[i]->next ; ptr != nullptr; ptr = ptr->next)
@@ -148,16 +148,26 @@ int difference(int gl , int gr){
 void solve()
 {
 
-    int input_left[N_MAX / 2];
-    int input_right[N_MAX / 2];
+    int* input_left;
+    int* input_right;
     int* gems = new int[1]();
     long long int total_cost = 0;
 
     cin >> n >> l >> r >> c;
-    initialization(table_left, input_left);
-    initialization(table_right, input_right);
-    build_table(table_left, input_left, n);
-    build_table(table_right, input_right, n);
+
+    input_left = new int[l]();
+    input_right = new int[r]();
+    initialization(input_left, l);
+    initialization(input_right, r);
+
+    if(min(l,r) == l){
+        linear_scan(&input_left , &input_right , l , r);
+    }
+    else {
+        linear_scan(&input_right , &input_left , r , l);
+    }
+
+    //////////////////////////// fixed below //////////////////////////////
     gems = build_hashtable(input_left, n); // important!!! using input_left as template to calculate difference
     
     for(int i = 0 ; i < n / 2 ; i++){
@@ -173,10 +183,6 @@ void solve()
     total_cost += rlcost;
 
     cout<<total_cost<<endl;
-
-    memoryfree(&table_left, n);
-    memoryfree(&table_right, n);
-    delete gems;
 
     return;
 }
